@@ -13,4 +13,14 @@ const timestampPatterns = [
   /^(\d{10})\s/,
 ];
 
-
+function normalizeResponseTime(raw) {
+    if (!raw) 
+        return null;
+    if (raw.endsWith("ms"))
+         return parseFloat(raw);
+    if (raw.endsWith("s"))
+         return parseFloat(raw) * 1000;
+        
+    return parseFloat(raw);
+  }
+  
