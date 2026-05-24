@@ -67,3 +67,36 @@ function normalizeResponseTime(raw) {
 
   return { type: "malformed", raw: line };
 
+async function parseFile(filePath) {
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`This File Not Found : ${filePath}`);
+    }
+  
+    const results = {
+      entries: [],
+      malformed: [],
+      total: 0,
+    };
+  
+    const rl = readline.createInterface({
+      input: fs.createReadStream(filePath),
+      crlfDelay: Infinity,
+    });
+  
+    for await (const line of rl) {
+      results.total++;
+      const parsed = parseLine(line);
+  
+      if (!parsed) 
+        continue;
+  
+      if (parsed.type === "malformed") {
+        results.malformed.push(parsed);
+      } else {
+        results.entries.push(parsed);
+      }
+    }
+    return results;
+  }
+  
+  module.exports = { parseFile, parseLine };
