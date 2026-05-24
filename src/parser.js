@@ -20,7 +20,31 @@ function normalizeResponseTime(raw) {
          return parseFloat(raw);
     if (raw.endsWith("s"))
          return parseFloat(raw) * 1000;
-        
+
     return parseFloat(raw);
+  }
+  
+  function parseLine(line) {
+    
+    if (!line || line.trim() === "") 
+        return null;
+  
+    if (line.trim().startsWith("{")) {
+      try {
+        const json = JSON.parse(line);
+        return {
+          type: "json",
+          timestamp: json.timestamp || json.time || null,
+          ip: json.ip || json.host || null,
+          method: json.method || null,
+          path: json.path || json.url || null,
+          status: json.status || json.statusCode || null,
+          responseTime: json.responseTime || json.duration || null,
+          raw: line,
+        };
+      } catch{
+        return { type: "malformed", raw: line };
+      }
+    }
   }
   
