@@ -24,3 +24,15 @@ function analyze(results) {
       method: e.method,
       responseTime: e.responseTime,
     }));
+
+  const topEndpoints = Object.entries(endpointCount)
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 10)
+  .map(([path, count]) => ({ path, count }));
+
+
+const methods = {};
+entries.forEach((e) => {
+  if (!e.method) return;
+  methods[e.method] = (methods[e.method] || 0) + 1;
+});
