@@ -88,3 +88,30 @@ function randomItem(arr) {
     ];
     return randomItem(malformed);
   }
+
+  function generateLogs(lineCount = 1000) {
+    const lines = [];
+  
+    for (let i = 0; i < lineCount; i++) {
+      const rand = Math.random();
+  
+      if (rand < 0.05) {
+        // 5% malformed
+        lines.push(generateMalformedLine());
+      } else if (rand < 0.10) {
+        // 5% JSON
+        lines.push(generateJSONLine());
+      } else {
+        // 90% standard
+        lines.push(generateStandardLine());
+      }
+    }
+  
+    return lines.join("\n");
+  }
+  
+  const lineCount = parseInt(process.argv[2]) || 1000;
+  const outputPath = path.resolve(__dirname, "../test.log");
+  
+  fs.writeFileSync(outputPath, generateLogs(lineCount));
+  console.log(`✅ Generated ${lineCount} lines → ${outputPath}`);
