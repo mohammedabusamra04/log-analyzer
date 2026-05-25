@@ -46,3 +46,22 @@ function randomItem(arr) {
         return Math.floor(date.getTime() / 1000).toString();
     }
   }
+
+  function generateResponseTime(type) {
+    const ms = randomInt(10, 3000);
+    switch (type) {
+      case 0: return `${ms}ms`;
+      case 1: return `${(ms / 1000).toFixed(3)}s`;
+      case 2: return `${ms}`;
+    }
+  }
+  
+  function generateStandardLine() {
+    const timestamp = generateTimestamp(randomInt(0, 3));
+    const ip = randomItem(IPS);
+    const method = randomItem(METHODS);
+    const path = randomItem(PATHS);
+    const status = randomItem(STATUS_CODES);
+    const responseTime = generateResponseTime(randomInt(0, 2));
+    return `${timestamp} ${ip} ${method} ${path} ${status} ${responseTime}`;
+  }
