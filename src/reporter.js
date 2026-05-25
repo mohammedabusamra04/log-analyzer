@@ -48,3 +48,24 @@ function report(analysis) {
       console.log(`  ${color(code.padEnd(10))} ${count}`);
     });
   console.log();
+
+  
+  console.log(chalk.bold.yellow("🔥 Top 10 Endpoints:"));
+  topEndpoints.forEach(({ path, count }, i) => {
+    console.log(`  ${chalk.gray(String(i + 1).padEnd(3))} ${chalk.white(path.padEnd(35))} ${chalk.green(count)}`);
+  });
+  console.log();
+
+  
+  console.log(chalk.bold.yellow("🐢 Slowest 10 Endpoints:"));
+  slowest.forEach(({ method, path, responseTime }, i) => {
+    console.log(
+      `  ${chalk.gray(String(i + 1).padEnd(3))} ${chalk.cyan(method.padEnd(8))} ${chalk.white(path.padEnd(35))} ${chalk.red(responseTime + "ms")}`
+    );
+  });
+  console.log();
+
+  console.log(chalk.bold.blue("═══════════════════════════════════════\n"));
+}
+
+module.exports = { report };
