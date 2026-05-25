@@ -1,52 +1,34 @@
 const fs = require("fs");
 const readline = require("readline");
 
-
-const timestampPatterns = [
-  
-  /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?)/,
-  // 2024/03/15 14:23:01
-  /^(\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2})/,
-  // 15-Mar-2024 14:23:01
-  /^(\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2})/,
-  // Unix epoch
-  /^(\d{10})\s/,
-];
-
 function normalizeResponseTime(raw) {
-    if (!raw) 
-        return null;
-    if (raw.endsWith("ms"))
-         return parseFloat(raw);
-    if (raw.endsWith("s"))
-         return parseFloat(raw) * 1000;
+  if (!raw) return null;
+  if (raw.endsWith("ms")) return parseFloat(raw);
+  if (raw.endsWith("s")) return parseFloat(raw) * 1000;
+  return parseFloat(raw);
+}
 
-    return parseFloat(raw);
-  }
-  
-  function parseLine(line) {
+function parseLine(line) {
+  if (!line || line.trim() === "") return null;
 
-    if (!line || line.trim() === "") 
-        return null;
-  
-    if (line.trim().startsWith("{")) {
-      try {
-        const json = JSON.parse(line);
-        return {
-          type: "json",
-          timestamp: json.timestamp || json.time || null,
-          ip: json.ip || json.host || null,
-          method: json.method || null,
-          path: json.path || json.url || null,
-          status: json.status || json.statusCode || null,
-          responseTime: json.responseTime || json.duration || null,
-          raw: line,
-        };
-      } catch{
-        return { type: "malformed", raw: line };
-      }
+  if (line.trim().startsWith("{")) {
+    try {
+      const json = JSON.parse(line);
+      return {
+        type: "json",
+        timestamp: json.timestamp || json.time || null,
+        ip: json.ip || json.host || null,
+        method: json.method || null,
+        path: json.path || json.url || null,
+        status: json.status || json.statusCode || null,
+        responseTime: json.responseTime || json.duration || null,
+        raw: line,
+      };
+    } catch {
+      return { type: "malformed", raw: line };
     }
   }
+
   
   const match = line.match(
     /^(\S+)\s+([\d.]+)\s+(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\s+(\S+)\s+(-|\d{3})\s+([\d.]+(?:ms|s)?)/i
@@ -66,37 +48,38 @@ function normalizeResponseTime(raw) {
   }
 
   return { type: "malformed", raw: line };
+} // ← هون لازم تنغلق الـ function
 
 async function parseFile(filePath) {
-    if (!fs.existsSync(filePath)) {
-      throw new Error(`This File Not Found : ${filePath}`);
-    }
-  
-    const results = {
-      entries: [],
-      malformed: [],
-      total: 0,
-    };
-  
-    const rl = readline.createInterface({
-      input: fs.createReadStream(filePath),
-      crlfDelay: Infinity,
-    });
-  
-    for await (const line of rl) {
-      results.total++;
-      const parsed = parseLine(line);
-  
-      if (!parsed) 
-        continue;
-  
-      if (parsed.type === "malformed") {
-        results.malformed.push(parsed);
-      } else {
-        results.entries.push(parsed);
-      }
-    }
-    return results;
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`This File Not Found: ${filePath}`);
   }
-  
-  module.exports = { parseFile, parseLine };
+
+  const results = {
+    entries: [],
+    malformed: [],
+    total: 0,
+  };
+
+  const rl = readline.createInterface({
+    input: fs.createReadStream(filePath),
+    crlfDelay: Infinity,
+  });
+
+  for await (const line of rl) {
+    results.total++;
+    const parsed = parseLine(line);
+
+    if (!parsed) continue;
+
+    if (parsed.type === "malformed") {
+      results.malformed.push(parsed);
+    } else {
+      results.entries.push(parsed);
+    }
+  }
+
+  return results;
+}
+
+module.exports = { parseFile, parseLine };
