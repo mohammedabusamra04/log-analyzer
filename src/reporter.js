@@ -31,3 +31,20 @@ function report(analysis) {
     console.log(`  ${chalk.cyan(method.padEnd(10))} ${count}`);
   });
   console.log();
+
+  
+  console.log(chalk.bold.yellow("📋 Status Codes:"));
+  Object.entries(statusCodes)
+    .sort((a, b) => b[1] - a[1])
+    .forEach(([code, count]) => {
+      const color =
+        code.startsWith("2")
+          ? chalk.green
+          : code.startsWith("4")
+          ? chalk.yellow
+          : code.startsWith("5")
+          ? chalk.red
+          : chalk.white;
+      console.log(`  ${color(code.padEnd(10))} ${count}`);
+    });
+  console.log();
