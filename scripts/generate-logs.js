@@ -65,3 +65,26 @@ function randomItem(arr) {
     const responseTime = generateResponseTime(randomInt(0, 2));
     return `${timestamp} ${ip} ${method} ${path} ${status} ${responseTime}`;
   }
+
+  function generateJSONLine() {
+    return JSON.stringify({
+      timestamp: new Date().toISOString(),
+      ip: randomItem(IPS),
+      method: randomItem(METHODS),
+      path: randomItem(PATHS),
+      status: randomItem(STATUS_CODES),
+      responseTime: randomInt(10, 3000),
+    });
+  }
+  
+  function generateMalformedLine() {
+    const malformed = [
+      "BROKEN LINE $$$ ###",
+      "at java.lang.Thread.run(Thread.java:748)",
+      "",
+      "   ",
+      "GET /api/users",
+      "2024-03-15 INCOMPLETE",
+    ];
+    return randomItem(malformed);
+  }
