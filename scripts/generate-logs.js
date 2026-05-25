@@ -30,3 +30,19 @@ function randomItem(arr) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
   
+  function generateTimestamp(type) {
+    const date = new Date(Date.now() - randomInt(0, 86400000));
+    switch (type) {
+      case 0: // ISO
+        return date.toISOString().replace(".000", "").replace(".000Z", "Z");
+      case 1: // 2024/03/15 14:23:01
+        return date.toISOString().slice(0, 10).replace(/-/g, "/") +
+          " " + date.toISOString().slice(11, 19);
+      case 2: // 15-Mar-2024 14:23:01
+        return date.toLocaleDateString("en-GB", {
+          day: "2-digit", month: "short", year: "numeric"
+        }).replace(/ /g, "-") + " " + date.toISOString().slice(11, 19);
+      case 3: // Unix epoch
+        return Math.floor(date.getTime() / 1000).toString();
+    }
+  }
